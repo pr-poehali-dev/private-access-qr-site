@@ -52,7 +52,19 @@ const Index = () => {
 
   const handleCodeSubmit = () => {
     const validCodes = ["083", "154", "1872"];
+    const resetCode = "2547";
     setError("");
+
+    // Проверка кода сброса
+    if (enteredCode === resetCode) {
+      // Сбрасываем лимиты для кодов 083 и 154
+      setCodeLimits({
+        "083": { count: 0, lastReset: Date.now() },
+        "154": { count: 0, lastReset: Date.now() },
+      });
+      setCurrentPage("success");
+      return;
+    }
 
     if (!validCodes.includes(enteredCode)) {
       setError("Ошибка");
@@ -175,38 +187,59 @@ const Index = () => {
     </div>
   );
 
-  const renderSuccessPage = () => (
-    <div className="min-h-screen bg-gradient-to-br from-[#25B7D1] via-[#4ECDC4] to-[#FF6B6B] flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm shadow-2xl border-0">
-        <CardContent className="text-center py-12">
-          <div className="mx-auto w-20 h-20 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center mb-6 animate-scale-in">
-            <Icon name="CheckCircle" size={40} className="text-white" />
-          </div>
+  const renderSuccessPage = () => {
+    // Автоматический переход через 5 секунд
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setCurrentPage("payment");
+        setEnteredCode("");
+        setError("");
+      }, 5000);
 
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent mb-4">
-            Успешно
-          </h2>
+      return () => clearTimeout(timer);
+    }, []);
 
-          <p className="text-gray-600 mb-8">
-            Доступ разрешен. Добро пожаловать!
-          </p>
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#25B7D1] via-[#4ECDC4] to-[#FF6B6B] flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm shadow-2xl border-0">
+          <CardContent className="text-center py-12">
+            <div className="mx-auto w-20 h-20 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center mb-6 animate-scale-in">
+              <Icon name="CheckCircle" size={40} className="text-white" />
+            </div>
 
-          <Button
-            onClick={() => {
-              setCurrentPage("payment");
-              setEnteredCode("");
-              setError("");
-            }}
-            variant="outline"
-            className="border-[#25B7D1] text-[#25B7D1] hover:bg-[#25B7D1] hover:text-white transition-all duration-300"
-          >
-            <Icon name="Home" size={16} className="mr-2" />
-            Вернуться на 1 страницу
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
-  );
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent mb-4">
+              Успешно
+            </h2>
+
+            <p className="text-gray-600 mb-8">
+              {enteredCode === "2547"
+                ? "Лимиты кодов сброшены!"
+                : "Доступ разрешен. Добро пожаловать!"}
+            </p>
+
+            <div className="mb-6">
+              <p className="text-sm text-gray-500">
+                Автоматический переход через 5 секунд...
+              </p>
+            </div>
+
+            <Button
+              onClick={() => {
+                setCurrentPage("payment");
+                setEnteredCode("");
+                setError("");
+              }}
+              variant="outline"
+              className="border-[#25B7D1] text-[#25B7D1] hover:bg-[#25B7D1] hover:text-white transition-all duration-300"
+            >
+              <Icon name="Home" size={16} className="mr-2" />
+              Вернуться сейчас
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
 
   const Index = () => {
     switch (currentPage) {
