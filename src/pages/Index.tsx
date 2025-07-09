@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ const Index = () => {
   >("payment");
   const [enteredCode, setEnteredCode] = useState("");
   const [error, setError] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Система лимитов для кодов
   const [codeLimits, setCodeLimits] = useState<{
@@ -22,6 +23,12 @@ const Index = () => {
   const handlePayment = () => {
     setCurrentPage("code");
   };
+
+  useEffect(() => {
+    if (currentPage === "code" && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [currentPage]);
 
   const checkCodeLimit = (code: string) => {
     if (code === "1872") return true; // Без ограничений
@@ -131,12 +138,14 @@ const Index = () => {
         <CardContent className="space-y-6">
           <div className="space-y-4">
             <Input
+              ref={inputRef}
               type="text"
               value={enteredCode}
               onChange={(e) => setEnteredCode(e.target.value)}
               placeholder="Введите код доступа"
               className="text-center text-lg font-mono tracking-wider py-3 border-2 focus:border-[#25B7D1] transition-all duration-300"
               maxLength={4}
+              autoFocus
             />
 
             {error && (
